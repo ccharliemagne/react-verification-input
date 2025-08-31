@@ -21,7 +21,7 @@ const VerificationInput = forwardRef(
       onBlur,
       onComplete,
     },
-    ref,
+    ref
   ) => {
     const [localValue, setLocalValue] = useState("");
     const [isActive, setActive] = useState(false);
@@ -66,6 +66,27 @@ const VerificationInput = forwardRef(
       }
     };
 
+    const handlePaste = (event) => {
+      event.preventDefault();
+      const pasted = event.clipboardData.getData("text").replace(/\s/g, "");
+
+      // take only valid characters up to length
+      const filtered = pasted
+        .split("")
+        .filter((ch) => new RegExp(`[${validChars}]`).test(ch))
+        .join("")
+        .slice(0, length);
+
+      if (filtered) {
+        onChange?.(filtered);
+        setLocalValue(filtered);
+
+        if (filtered.length === length) {
+          onComplete?.(filtered);
+        }
+      }
+    };
+
     const getValue = () => {
       return value ?? localValue;
     };
@@ -96,7 +117,7 @@ const VerificationInput = forwardRef(
           className={classNames(
             "vi__container",
             classes.container,
-            containerClassName,
+            containerClassName
           )}
           onClick={() => inputRef.current.focus()}
           {...restContainerProps}
@@ -116,6 +137,7 @@ const VerificationInput = forwardRef(
             }}
             className={classNames("vi", inputClassName)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             onFocus={() => {
               setActive(true);
               onFocus?.();
@@ -143,7 +165,7 @@ const VerificationInput = forwardRef(
                 },
                 isCharacterSelected(i) && classes.characterSelected,
                 isCharacterInactive(i) && classes.characterInactive,
-                isCharacterFilled(i) && classes.characterFilled,
+                isCharacterFilled(i) && classes.characterFilled
               )}
               onClick={handleClick}
               id={`field-${i}`}
@@ -159,7 +181,7 @@ const VerificationInput = forwardRef(
         <style dangerouslySetInnerHTML={{ __html: style }} />
       </>
     );
-  },
+  }
 );
 
 VerificationInput.displayName = "VerificationInput";
